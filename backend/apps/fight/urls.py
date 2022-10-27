@@ -1,6 +1,10 @@
-# from rest_framework.routers import SimpleRouter
-# from rest_framework_nested.routers import NestedSimpleRouter
-#
-#
-#
-# app_name = 'fight'
+from rest_framework.routers import SimpleRouter
+from .views import FigthViewSet
+
+app_name = 'fight'
+
+
+router = SimpleRouter(trailing_slash=False)
+router.register(r'fight', FigthViewSet, basename='personajes')
+
+urlpatterns = router.urls

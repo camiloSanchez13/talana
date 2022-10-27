@@ -1,0 +1,1 @@
+from .fight_serializer import FightSerializer
