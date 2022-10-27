@@ -16,9 +16,9 @@ class FigthViewSet(viewsets.GenericViewSet):
 
         serializer = FightSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        id = serializer.validated_data.get('id',None)
-        inst = get_object_or_404(Fight, id=id) if id else None
-        serializer.update(inst, serializer.validated_data) if inst else serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # id = serializer.validated_data.get('id',None)
+        # inst = get_object_or_404(Fight, id=id) if id else None
+        # serializer.update(inst, serializer.validated_data) if inst else serializer.save()
+        serializer.save()
+        return Response("creo el objeto", status=status.HTTP_200_OK)
 
