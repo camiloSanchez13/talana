@@ -24,6 +24,8 @@ class Fight(models.Model):
 
 class History(models.Model):
     fight_mov = models.ForeignKey(Fight, on_delete=models.CASCADE, related_name='history')
+    character = models.ForeignKey(Character, on_delete=models.CASCADE,
+                                     related_name="historial")
     movement = models.CharField(max_length=4, null=True, blank=True)
     turn = models.PositiveIntegerField()
     hit = models.CharField(max_length=1, null=True, blank=True)
