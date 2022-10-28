@@ -19,5 +19,8 @@ services:
     volumes:
       - static_volume:/src/static
 
+    command: bash -c "python manage.py migrate &&
+      python manage.py collectstatic --no-input --clear && python manage.py loaddata personajes
+
 volumes:
   static_volume:

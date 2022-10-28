@@ -1,0 +1,98 @@
+[
+{
+  "model": "character.character",
+  "pk": 1,
+  "fields": {
+    "name": "Tonyn Stallone",
+    "creation_date": "2022-10-27T00:11:22Z"
+  }
+},
+{
+  "model": "character.character",
+  "pk": 2,
+  "fields": {
+    "name": "Arnaldor Shuatseneguer",
+    "creation_date": "2022-10-27T00:11:36Z"
+  }
+},
+{
+  "model": "character.power",
+  "pk": 17,
+  "fields": {
+    "name": "Taladoken",
+    "combination": "DSDP",
+    "energy_attack": 3,
+    "character": 1
+  }
+},
+{
+  "model": "character.power",
+  "pk": 18,
+  "fields": {
+    "name": "Remuyuken",
+    "combination": "SDK",
+    "energy_attack": 2,
+    "character": 1
+  }
+},
+{
+  "model": "character.power",
+  "pk": 19,
+  "fields": {
+    "name": "Pu�o",
+    "combination": "P",
+    "energy_attack": 1,
+    "character": 1
+  }
+},
+{
+  "model": "character.power",
+  "pk": 20,
+  "fields": {
+    "name": "Patada",
+    "combination": "K",
+    "energy_attack": 1,
+    "character": 1
+  }
+},
+{
+  "model": "character.power",
+  "pk": 21,
+  "fields": {
+    "name": "Remuyuken",
+    "combination": "SAK",
+    "energy_attack": 3,
+    "character": 2
+  }
+},
+{
+  "model": "character.power",
+  "pk": 22,
+  "fields": {
+    "name": "Taladoken",
+    "combination": "ASAP",
+    "energy_attack": 2,
+    "character": 2
+  }
+},
+{
+  "model": "character.power",
+  "pk": 23,
+  "fields": {
+    "name": "Pu�o",
+    "combination": "P",
+    "energy_attack": 1,
+    "character": 2
+  }
+},
+{
+  "model": "character.power",
+  "pk": 24,
+  "fields": {
+    "name": "Patada",
+    "combination": "K",
+    "energy_attack": 1,
+    "character": 2
+  }
+}
+]
