@@ -20,7 +20,8 @@ services:
       - static_volume:/src/static
 
     command: bash -c "python manage.py migrate &&
-      python manage.py collectstatic --no-input --clear && python manage.py loaddata personajes
+      python manage.py collectstatic --no-input --clear && python manage.py loaddata personajes & gunicorn
+      --workers 4 --bind :8000 --timeout 500 --reload config.wsgi"
 
 volumes:
   static_volume:
