@@ -5,7 +5,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from ..models.fight import Fight
-from ..serializers.fight_serializer import FightSerializer
+from ..serializers.fight_serializer import FightSerializer, HistorySerializer
 
 
 class FigthViewSet(viewsets.GenericViewSet):
@@ -16,9 +16,6 @@ class FigthViewSet(viewsets.GenericViewSet):
 
         serializer = FightSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # id = serializer.validated_data.get('id',None)
-        # inst = get_object_or_404(Fight, id=id) if id else None
-        # serializer.update(inst, serializer.validated_data) if inst else serializer.save()
-        serializer.save()
-        return Response("creo el objeto", status=status.HTTP_200_OK)
+        instance = serializer.save()
+        return Response(HistorySerializer(instance.history.all(), many=True).data, status=status.HTTP_200_OK)
 

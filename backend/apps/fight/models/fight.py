@@ -28,7 +28,7 @@ class History(models.Model):
                                      related_name="historial")
     movement = models.CharField(max_length=4, null=True, blank=True)
     turn = models.PositiveIntegerField()
-    hit = models.CharField(max_length=1, null=True, blank=True)
+    relato = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.movement

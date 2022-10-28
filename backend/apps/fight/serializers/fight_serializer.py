@@ -29,11 +29,10 @@ class FightSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         p1, p2 = desglozar(validated_data)
-        print("los movements son : ", p1.get('movements', None))
         instance = Fight.objects.create(character_p1=p1.get('id'), character_p2=p2.get('id'))
 
         # obtenerMovimientos(p1, p2)
-        main_fight(startFight(p1, p2), p1,p2)
+        main_fight(startFight(p1, p2), p1,p2, instance)
         # History.objects.bulk_create([History(fight_mov=instance, movement=p1.get('movements', None), turn="1", hit="Patada", character=p1.get('id')),
         #                              History(fight_mov=instance, movement=p2.get('movements', None), turn="1", hit="Combo",
         #                                      character=p2.get('id'))])
@@ -51,7 +50,11 @@ class FightSerializer(serializers.Serializer):
     #     return True
 
 
+class HistorySerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = History
+        fields = ['relato']
 #TODO: MOVER A SERVICIOS y CREAR SERVICIOS PARA CREAR HISTORIAL DE MOVIMIENTOS
 
 def desglozar(val):
@@ -108,73 +111,87 @@ def combination_movements(movements, hits):
     movements_hits = []
     for i, m in enumerate(movements):
         movements_hits.append(m + hits[i])
-    print("movimientos combinados ", movements_hits)
+
+    print("los movimientos mas hits son : ", movements_hits )
     return movements_hits
 
 
 
-def main_fight(start, pj1, pj2):
+def main_fight(start, pj1, pj2, fight):
     relato2 = ""
     relato1 = ""
-    #TODO debo sacar los poderes como lo que termina el movimiento ej : AADSD + P es un Taladoken (antes se movió para atrás 2 veces);
+    #TODO OPTIMIZAR EL POR EL CUAL COMIENZA
     vida_p1, vida_p2 = 6, 6
     atacks_p1 = combination_movements(pj1.get('movements', None), pj1.get('hits', None))
     atacks_p2 = combination_movements(pj2.get('movements', None), pj2.get('hits', None))
 
     if start == 'P1':
         for x, y in zip(atacks_p1, atacks_p2):
-
-            vida_p2, relato2 = attacks_energy(pj1, vida_p2, x, relato1)
-            vida_p1, relato1 = attacks_energy(pj2, vida_p1, y, relato2)
-            print("vida del p2 ;", vida_p2)
-            print("vida del p1 ;", vida_p1)
+            relato2=""
+            relato1=""
+            vida_p2, relato2 = attacks_energy(pj1, vida_p2, x, fight)
+            # print(f"se comenzo por el player 2 y mando estos datos : vida : {vida_p2} y relato {relato1} y movimiento {x}")
+            vida_p1, relato1 = attacks_energy(pj2, vida_p1, y, fight)
             if vida_p2 <= 0:
                 print("relato1 ", relato1)
                 print("relato2 ", relato2)
                 print("gano el p1")
-                return "Gano el P1"
+                break
             elif vida_p1 <= 0:
                 print("relato1 ", relato1)
                 print("relato2 ", relato2)
-                print("gano el p1")
-                return "Gano el P2"
+                print("gano el p2")
+                break
     else:
         for x, y in zip(atacks_p1, atacks_p2):
-            vida_p1, relato1 = attacks_energy(pj2, vida_p1, x, relato2)
-            vida_p2, relato2 = attacks_energy(pj1, vida_p2, x, relato1)
+            relato2 = ""
+            relato1 = ""
+            vida_p1, relato1 = attacks_energy(pj2, vida_p1, y, fight)
+            vida_p2, relato2 = attacks_energy(pj1, vida_p2, x, fight)
+            # print("vida del p2 ;", vida_p2)
+            # print("vida del p1 ;", vida_p1)
             if vida_p2 <= 0:
-                return "Gano el P1"
+                print("Gano el p1")
+                break
             elif vida_p1 <= 0:
-                return "Gano el P1"
+                print("Gano el P2")
+                break
+
+def attacks_energy(player, life, mov, fight):
 
 
-def attacks_energy(player, life, mov, relato):
-
-
-    #falta separar de los movimientos los poderes :
-    # poderes =player.get('id').powers.all()
-    #
-    # for p in poderes:
-    #     if p.combination in mov:
-    #         print(f"el podeer se encuentra en la combinacion: {mov} del valor comparado {p.combination}")
-    #         print("ocupa la posicion: ", mov.index(p.combination))
-
-    if Power.objects.filter(character=player.get('id'), combination=mov).exists():
-        life = life - Power.objects.get(character=player.get('id'), combination=mov).energy_attack
-    elif mov.endswith(('P', 'K')):
+    #TODO falta separar de los movimientos los poderes :
+    poderes =player.get('id').powers.all().exclude(combination__in=['P','K'])
+    val = mov
+    relato = ""
+    relatv2=""
+    print(f"movimiento a relatar {val} del player llamado : {player.get('id')}")
+    # print(f"movimiento a revisar : {val} del player {player.get('id')}")
+    for p in poderes:
+        if mov.endswith(p.combination) :
+            life = life - p.energy_attack
+            val = mov.replace(p.combination, "")
+            relatv2 = F'Utiliza el poder {p.name} sin piedad'
+            break
+    if val.endswith(('P', 'K')):
         life = life - 1
+        print("si termina en P o K el valor ", val)
+        relatv2 = relatv2 + "Pega una patada o puño"
+    # if Power.objects.filter(character=player.get('id'), combination=mov).exists():
+    #     life = life - Power.objects.get(character=player.get('id'), combination=mov).energy_attack
     else:
-        for x in mov:
+        for x in val:
             if x == "W":
                 relato = f'{relato}  Salto '
             elif x == "A":
-                relato = f'{relato} retrocedio '  #si es  player uno o dos ver para donde camina
+                relato = f'{relato} retrocede '  #si es  player uno o dos ver para donde camina
             elif x == "S":
-                relato = f'{relato} Se agacho'
+                relato = f'{relato} Se agacho '
             elif x == "D":
-                relato = f'{relato}  Avanzo '
+                relato = f'{relato}  Avanzo  '
+
+    relato = f'{player.get("id").name} {relato}  {relatv2}'
+    History.objects.create(fight_mov=fight, movement=mov, turn="1", relato=relato,
+                                              character=player.get('id'))
+    print("el relato es : ", relato)
     return life, relato
-
-
-def querysetToTuple():
-    return None

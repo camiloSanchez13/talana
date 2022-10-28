@@ -1,1 +1,1 @@
-from .fight_serializer import FightSerializer
+from .fight_serializer import FightSerializer, HistorySerializer
